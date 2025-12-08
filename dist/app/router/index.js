@@ -1,7 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const router = (0, express_1.Router)();
+import { Router } from "express";
+const router = Router();
 const modulesRoutes = [
 // {
 //     path:'/customers',
@@ -17,4 +15,4 @@ const modulesRoutes = [
 // }
 ];
 modulesRoutes.forEach((route) => router.use(route.path, route.route));
-exports.default = router;
+export default router;

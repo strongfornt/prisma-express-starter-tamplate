@@ -1,14 +1,9 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const zod_1 = require("zod");
-const config_1 = __importDefault(require("../config"));
-const zod_error_1 = __importDefault(require("../errors/zod.error"));
-const duplicate_error_1 = __importDefault(require("../errors/duplicate.error"));
-const prisma_not_found_error_1 = __importDefault(require("../errors/prisma.not.found.error"));
-const custome_error_1 = require("../errors/custome.error");
+import { ZodError } from 'zod';
+import config from '../config';
+import handleZodError from '../errors/zod.error';
+import handleDuplicateError from '../errors/duplicate.error';
+import handleNotFoundError from '../errors/prisma.not.found.error';
+import { CustomError } from '../errors/custome.error';
 const globalErrorHandler = (err, req, res, next) => {
     //setting  default error
     let statusCode = 500;
@@ -19,37 +14,37 @@ const globalErrorHandler = (err, req, res, next) => {
             message: 'something went wrong',
         },
     ];
-    if (err instanceof zod_1.ZodError) {
-        const simpleFydError = (0, zod_error_1.default)(err);
-        statusCode = simpleFydError === null || simpleFydError === void 0 ? void 0 : simpleFydError.statusCode;
-        message = simpleFydError === null || simpleFydError === void 0 ? void 0 : simpleFydError.message;
-        error = simpleFydError === null || simpleFydError === void 0 ? void 0 : simpleFydError.error;
+    if (err instanceof ZodError) {
+        const simpleFydError = handleZodError(err);
+        statusCode = simpleFydError?.statusCode;
+        message = simpleFydError?.message;
+        error = simpleFydError?.error;
     }
-    else if ((err === null || err === void 0 ? void 0 : err.code) === 'P2002') {
-        const simpleFydError = (0, duplicate_error_1.default)(err);
-        statusCode = simpleFydError === null || simpleFydError === void 0 ? void 0 : simpleFydError.statusCode;
-        message = simpleFydError === null || simpleFydError === void 0 ? void 0 : simpleFydError.message;
-        error = simpleFydError === null || simpleFydError === void 0 ? void 0 : simpleFydError.error;
+    else if (err?.code === 'P2002') {
+        const simpleFydError = handleDuplicateError(err);
+        statusCode = simpleFydError?.statusCode;
+        message = simpleFydError?.message;
+        error = simpleFydError?.error;
     }
-    else if ((err === null || err === void 0 ? void 0 : err.code) === 'P2025') {
-        const simpleFydError = (0, prisma_not_found_error_1.default)(err);
-        statusCode = simpleFydError === null || simpleFydError === void 0 ? void 0 : simpleFydError.statusCode;
-        message = simpleFydError === null || simpleFydError === void 0 ? void 0 : simpleFydError.message;
-        error = simpleFydError === null || simpleFydError === void 0 ? void 0 : simpleFydError.error;
+    else if (err?.code === 'P2025') {
+        const simpleFydError = handleNotFoundError(err);
+        statusCode = simpleFydError?.statusCode;
+        message = simpleFydError?.message;
+        error = simpleFydError?.error;
     }
-    else if (err instanceof custome_error_1.CustomError) {
-        statusCode = err === null || err === void 0 ? void 0 : err.statusCode;
-        message = err === null || err === void 0 ? void 0 : err.message;
+    else if (err instanceof CustomError) {
+        statusCode = err?.statusCode;
+        message = err?.message;
         error = [{
                 path: '',
-                message: err === null || err === void 0 ? void 0 : err.message,
+                message: err?.message,
             }];
     }
     else if (err instanceof Error) {
-        message = err === null || err === void 0 ? void 0 : err.message;
+        message = err?.message;
         error = [{
                 path: '',
-                message: err === null || err === void 0 ? void 0 : err.message,
+                message: err?.message,
             }];
     }
     res.status(statusCode).json({
@@ -57,11 +52,11 @@ const globalErrorHandler = (err, req, res, next) => {
         message,
         statusCode,
         error,
-        stack: config_1.default.env === 'development' ? err === null || err === void 0 ? void 0 : err.stack : null,
+        stack: config.env === 'development' ? err?.stack : null,
         // error: err,
     });
 };
-exports.default = globalErrorHandler;
+export default globalErrorHandler;
 //pattern
 /*
   success

@@ -1,11 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const http_status_codes_1 = require("http-status-codes");
+import { StatusCodes } from 'http-status-codes';
 const notFound = (req, res, next) => {
-    res.status(http_status_codes_1.StatusCodes.NOT_FOUND).json({
+    res.status(StatusCodes.NOT_FOUND).json({
         success: false,
         message: 'Not Found Api',
         error: '',
     });
 };
-exports.default = notFound;
+export default notFound;
